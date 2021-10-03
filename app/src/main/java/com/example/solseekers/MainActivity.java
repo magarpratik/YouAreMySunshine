@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
                                         gridLabel.setHorizontalAxisTitle("Duration (Days)");
+                                        gridLabel.setVerticalAxisTitle("kW-hr/m^2/day");
 
                                         graph.removeAllSeries();
                                         LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
@@ -181,6 +182,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                         // Display the graph
                                         graph = findViewById(R.id.graph);
+
+                                        graph.setTitle("Solar Irradiance Levels from " + startDate + " to " + endDate);
 
                                         GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
                                         gridLabel.setHorizontalAxisTitle("Duration (Months)");
