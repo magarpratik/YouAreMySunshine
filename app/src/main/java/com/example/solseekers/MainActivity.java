@@ -24,6 +24,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.GridLabelRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
@@ -110,6 +111,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                         // Display the graph
                                         graph = findViewById(R.id.graph);
+
+                                        graph.setTitle("Solar Irradiance Levels from " + dateFormatter(startDate) + " to " + dateFormatter(endDate));
+
+                                        GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
+                                        gridLabel.setHorizontalAxisTitle("Duration (Days)");
+
                                         graph.removeAllSeries();
                                         LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
 
@@ -174,6 +181,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                         // Display the graph
                                         graph = findViewById(R.id.graph);
+
+                                        GridLabelRenderer gridLabel = graph.getGridLabelRenderer();
+                                        gridLabel.setHorizontalAxisTitle("Duration (Months)");
+
                                         graph.removeAllSeries();
                                         LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
 
@@ -198,6 +209,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         });
+    }
+
+    public String dateFormatter(String date) {
+        String result = date.substring(0, 4) + "/" + date.substring(4, 6) + "/" + date.substring(6, 8);
+        return result;
     }
 
     @Override
