@@ -34,7 +34,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    private TextView result;
     private EditText longitudeText;
     private EditText latitudeText;
     private EditText startDateText;
@@ -42,8 +41,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Button button;
     private Spinner spinner;
     private GraphView graph;
+    private MainActivity mainActivity = this;
 
-    private LineGraphSeries<DataPoint> series;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,62 +63,80 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        spinner.setOnItemSelectedListener(this);
+        String timePeriod = spinner.getSelectedItem().toString();
 
-        // Send a GET request to NASA API
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-        String url = "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=-1.4795&latitude=52.5248&start=20210301&end=20210322&format=JSON";
-
-        // ArrayLists to hold clean data
-        ArrayList<Integer> dates = new ArrayList<Integer>();
-        ArrayList<Float> solarIrradiance = new ArrayList<Float>();
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-                    @RequiresApi(api = Build.VERSION_CODES.N)
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            // get raw Data
-                            JSONObject properties = response.getJSONObject("properties");
-                            JSONObject parameter = properties.getJSONObject("parameter");
-                            JSONObject data = parameter.getJSONObject("ALLSKY_SFC_SW_DWN");
-
-                            // clean data
-                            String rawData = data.toString().replace("{", "").replace("}", "");
-                            // split data into arrays
-                            String splitData[] = rawData.split(",");
-
-                            for (int i = 0; i < splitData.length; i++) {
-                                String temp[] = splitData[i].split(":");
-                                dates.add(Integer.parseInt(temp[0].substring(1, temp[0].length() - 1)));
-                                solarIrradiance.add(Float.parseFloat(temp[1]));
-                            }
-
-                            float x, y;
-
-                            // Display the graph
-                            graph = findViewById(R.id.graph);
-                            series = new LineGraphSeries<DataPoint>();
-
-                            for (int i = 0; i < dates.size(); i++) {
-                                x = i;
-                                y = solarIrradiance.get(i);
-                                series.appendData(new DataPoint(x, y), true, dates.size());
-                            }
-                            graph.addSeries(series);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onClick(View v) {
+                if (timePeriod.equals("daily")) {
+
+                    String longitude = longitudeText.getText().toString();
+                    String latitude = latitudeText.getText().toString();
+                    String startDate = startDateText.getText().toString();
+                    String endDate = endDateText.getText().toString();
+
+                    // Send a GET request to NASA API
+                    RequestQueue requestQueue = Volley.newRequestQueue(mainActivity);
+
+                    String url = "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&format=JSON&longitude="
+                            + longitude + "&latitude=" + latitude + "&start=" + startDate + "&end=" + endDate;
+
+                    // ArrayLists to hold clean data
+                    ArrayList<Integer> dates = new ArrayList<Integer>();
+                    ArrayList<Float> solarIrradiance = new ArrayList<Float>();
+
+                    JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                            new Response.Listener<JSONObject>() {
+                                @RequiresApi(api = Build.VERSION_CODES.N)
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    try {
+                                        // get raw Data
+                                        JSONObject properties = response.getJSONObject("properties");
+                                        JSONObject parameter = properties.getJSONObject("parameter");
+                                        JSONObject data = parameter.getJSONObject("ALLSKY_SFC_SW_DWN");
+
+                                        // clean data
+                                        String rawData = data.toString().replace("{", "").replace("}", "");
+                                        // split data into arrays
+                                        String splitData[] = rawData.split(",");
+
+                                        for (int i = 0; i < splitData.length; i++) {
+                                            String temp[] = splitData[i].split(":");
+                                            dates.add(Integer.parseInt(temp[0].substring(1, temp[0].length() - 1)));
+                                            solarIrradiance.add(Float.parseFloat(temp[1]));
+                                        }
+
+                                        float x, y;
+
+                                        // Display the graph
+                                        graph = findViewById(R.id.graph);
+                                        graph.removeAllSeries();
+                                        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>();
+
+                                        for (int i = 0; i < dates.size(); i++) {
+                                            x = i;
+                                            y = solarIrradiance.get(i);
+                                            series.appendData(new DataPoint(x, y), true, dates.size());
+                                        }
+                                        graph.addSeries(series);
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                        }
+                    });
+                    requestQueue.add(request);
+                }
+                else if (timePeriod.equals("monthly")) {
+
+                }
             }
         });
-        requestQueue.add(request);
     }
 
     @Override
