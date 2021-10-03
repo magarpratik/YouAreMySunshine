@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SolSeekers</string>
+    <string-array name="timePeriod">
+        <item>daily</item>
+        <item>monthly</item>
+    </string-array>
+</resources>
