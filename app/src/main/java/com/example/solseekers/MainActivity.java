@@ -96,8 +96,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 solarIrradiance.add(Float.parseFloat(temp[1]));
                             }
 
-                            result.setText(dates.get(7).toString() + ":" + solarIrradiance.get(7).toString());
-
                             float x, y;
 
                             // Display the graph
